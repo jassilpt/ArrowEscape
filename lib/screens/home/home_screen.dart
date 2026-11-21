@@ -381,6 +381,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final themeColors = AppThemes.getThemeColors(progress.selectedTheme);
     final l10n = AppLocalizations.of(context)!;
 
+    // Secondary accent color for rich 3D dual-tone gradient
+    final secondaryAccent = themeColors.isLight
+        ? themeColors.accentDark
+        : Color.lerp(themeColors.accentColor, const Color(0xFF9D4EDD), 0.55)!;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
@@ -392,7 +397,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _AppBarIconButton(
-                  icon: Icons.palette_rounded,
+                  icon: Icons.palette_outlined,
                   iconColor: themeColors.accentColor,
                   themeColors: themeColors,
                   onTap: _cycleTheme,
@@ -403,16 +408,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: themeColors.surface,
+                    color: themeColors.surface.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: themeColors.accentColor.withValues(alpha: 0.45),
+                      color: themeColors.accentColor.withValues(alpha: 0.55),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: themeColors.accentColor.withValues(alpha: 0.15),
-                        blurRadius: 12,
+                        color: themeColors.accentColor.withValues(alpha: 0.2),
+                        blurRadius: 14,
                         spreadRadius: 1,
                       ),
                     ],
@@ -421,25 +426,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.bolt_rounded,
+                        Icons.flag_rounded,
                         color: themeColors.accentColor,
-                        size: 18,
+                        size: 17,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       Text(
                         l10n.levelHeader(progress.currentLevel),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
                           color: themeColors.textPrimary,
-                          letterSpacing: 1.4,
+                          letterSpacing: 1.5,
                         ),
                       ),
                     ],
                   ),
                 ),
                 _AppBarIconButton(
-                  icon: Icons.settings_rounded,
+                  icon: Icons.settings_outlined,
                   iconColor: themeColors.textPrimary,
                   themeColors: themeColors,
                   onTap: () => Navigator.push(
@@ -454,222 +459,438 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(gradient: themeColors.bgGradient),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-
-              // Premium Glowing Emblem
-              Container(
-                width: 112,
-                height: 112,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      themeColors.accentColor.withValues(alpha: 0.28),
-                      themeColors.surface.withValues(alpha: 0.9),
-                    ],
-                  ),
-                  border: Border.all(
-                    color: themeColors.accentColor,
-                    width: 2.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: themeColors.accentColor.withValues(alpha: 0.35),
-                      blurRadius: 28,
-                      spreadRadius: 4,
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.navigation_rounded,
-                    size: 56,
-                    color: themeColors.arrowColor,
-                  )
-                      .animate(
-                        onPlay: (controller) =>
-                            controller.repeat(reverse: true),
-                      )
-                      .slideY(
-                        begin: 0.08,
-                        end: -0.08,
-                        duration: 1400.ms,
-                        curve: Curves.easeInOut,
-                      )
-                      .then()
-                      .shimmer(duration: 1200.ms),
+      body: Stack(
+        children: [
+          // 1. Base Theme Gradient
+          Container(
+            decoration: BoxDecoration(gradient: themeColors.bgGradient),
+          ),
+          // 2. Subtle Arcade Puzzle Grid Background
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _ArcadeGridPainter(
+                gridColor: themeColors.accentColor.withValues(
+                  alpha: themeColors.isLight ? 0.08 : 0.06,
                 ),
               ),
+            ),
+          ),
+          // 3. Main Content
+          SafeArea(
+            child: Column(
+              children: [
+                const Spacer(flex: 2),
 
-              const SizedBox(height: 24),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    l10n.appTitle,
-                    style: TextStyle(
-                      fontSize: 46,
-                      fontWeight: FontWeight.w900,
-                      color: themeColors.textPrimary,
-                      letterSpacing: 3,
-                      shadows: themeColors.hasGlow
-                          ? [
-                              Shadow(
-                                color: themeColors.accentColor
-                                    .withValues(alpha: 0.45),
-                                blurRadius: 18,
-                              ),
-                            ]
-                          : null,
+                // 3D Glowing Emblem Ring + Custom 3D Beveled Arrow
+                Container(
+                  width: 142,
+                  height: 142,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        themeColors.accentColor.withValues(alpha: 0.28),
+                        secondaryAccent.withValues(alpha: 0.14),
+                        themeColors.surface.withValues(alpha: 0.92),
+                      ],
+                      stops: const [0.0, 0.55, 1.0],
                     ),
+                    border: Border.all(
+                      color: themeColors.accentColor,
+                      width: 3.0,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: themeColors.accentColor.withValues(alpha: 0.45),
+                        blurRadius: 34,
+                        spreadRadius: 4,
+                      ),
+                      BoxShadow(
+                        color: secondaryAccent.withValues(alpha: 0.25),
+                        blurRadius: 48,
+                        spreadRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      width: 78,
+                      height: 78,
+                      child: CustomPaint(
+                        painter: _Arrow3DEmblemPainter(
+                          primaryColor: themeColors.accentColor,
+                          secondaryColor: secondaryAccent,
+                          depthColor: themeColors.accentDark,
+                          isLight: themeColors.isLight,
+                        ),
+                      ),
+                    )
+                        .animate(
+                          onPlay: (controller) =>
+                              controller.repeat(reverse: true),
+                        )
+                        .slideY(
+                          begin: 0.07,
+                          end: -0.07,
+                          duration: 1400.ms,
+                          curve: Curves.easeInOut,
+                        )
+                        .then()
+                        .shimmer(
+                          duration: 1300.ms,
+                          color: Colors.white.withValues(alpha: 0.45),
+                        ),
+                  ),
+                ),
+
+                const SizedBox(height: 26),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      l10n.appTitle,
+                      style: TextStyle(
+                        fontSize: 46,
+                        fontWeight: FontWeight.w900,
+                        color: themeColors.textPrimary,
+                        letterSpacing: 3.5,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(
+                              alpha: themeColors.isLight ? 0.12 : 0.65,
+                            ),
+                            offset: const Offset(0, 4),
+                            blurRadius: 10,
+                          ),
+                          if (themeColors.hasGlow)
+                            Shadow(
+                              color: themeColors.accentColor
+                                  .withValues(alpha: 0.5),
+                              blurRadius: 20,
+                            ),
+                        ],
+                      ),
+                    ),
+                  )
+                      .animate()
+                      .fadeIn(duration: 800.ms)
+                      .scale(
+                        begin: const Offset(0.9, 0.9),
+                        end: const Offset(1.0, 1.0),
+                        curve: Curves.easeOutBack,
+                      ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Text(
+                  l10n.appTagline,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: themeColors.textSecondary,
+                    letterSpacing: 2.5,
                   ),
                 )
                     .animate()
-                    .fadeIn(duration: 800.ms)
-                    .scale(
-                      begin: const Offset(0.9, 0.9),
-                      end: const Offset(1.0, 1.0),
-                      curve: Curves.easeOutBack,
-                    ),
-              ),
+                    .fadeIn(delay: 300.ms, duration: 600.ms)
+                    .slideY(begin: 0.5, end: 0),
 
-              const SizedBox(height: 8),
+                const Spacer(flex: 3),
 
-              Text(
-                l10n.appTagline,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: themeColors.textSecondary,
-                  letterSpacing: 2.2,
-                ),
-              )
-                  .animate()
-                  .fadeIn(delay: 300.ms, duration: 600.ms)
-                  .slideY(begin: 0.5, end: 0),
-
-              const Spacer(flex: 3),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 36),
-                child: Column(
-                  children: [
-                    // Primary Highlighted PLAY Button
-                    GestureDetector(
-                      onTap: _isNavigating
-                          ? null
-                          : () async {
-                              AudioHapticHelper.playClick();
-                              if (!mounted) return;
-                              setState(() => _isNavigating = true);
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => GameScreen(
-                                    level: progress.currentLevel,
-                                    gameMode: GameMode.classic,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 36),
+                  child: Column(
+                    children: [
+                      // Primary Glossy 3D Dual-Gradient PLAY Button with Moving Light Sweep
+                      GestureDetector(
+                        onTap: _isNavigating
+                            ? null
+                            : () async {
+                                AudioHapticHelper.playClick();
+                                if (!mounted) return;
+                                setState(() => _isNavigating = true);
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => GameScreen(
+                                      level: progress.currentLevel,
+                                      gameMode: GameMode.classic,
+                                    ),
+                                  ),
+                                );
+                                if (mounted) {
+                                  setState(() => _isNavigating = false);
+                                }
+                              },
+                        child: Container(
+                          width: double.infinity,
+                          height: 62,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                themeColors.accentColor,
+                                secondaryAccent,
+                              ],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: themeColors.accentDark,
+                                offset: const Offset(0, 5),
+                                blurRadius: 0,
+                              ),
+                              BoxShadow(
+                                color: themeColors.accentColor
+                                    .withValues(alpha: 0.45),
+                                blurRadius: 22,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Top Half Glossy Reflection
+                                Positioned(
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  height: 28,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.white.withValues(alpha: 0.28),
+                                          Colors.white.withValues(alpha: 0.02),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              );
-                              if (mounted) {
-                                setState(() => _isNavigating = false);
-                              }
-                            },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              themeColors.accentColor,
-                              themeColors.accentDark,
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                                // Button Content
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.play_arrow_rounded,
+                                      color: themeColors.accentColor
+                                                  .computeLuminance() >
+                                              0.5
+                                          ? Colors.black
+                                          : Colors.white,
+                                      size: 30,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      l10n.menuPlay,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        color: themeColors.accentColor
+                                                    .computeLuminance() >
+                                                0.5
+                                            ? Colors.black
+                                            : Colors.white,
+                                        letterSpacing: 2.2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: [
-                            BoxShadow(
-                              color: themeColors.accentColor
-                                  .withValues(alpha: 0.4),
-                              blurRadius: 18,
-                              offset: const Offset(0, 6),
+                        )
+                            .animate(
+                              onPlay: (controller) => controller.repeat(),
+                            )
+                            .shimmer(
+                              delay: 1200.ms,
+                              duration: 1500.ms,
+                              angle: 0.35,
+                              color: Colors.white.withValues(alpha: 0.55),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.play_arrow_rounded,
-                              color: themeColors.accentColor.computeLuminance() >
-                                      0.5
-                                  ? Colors.black
-                                  : Colors.white,
-                              size: 28,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              l10n.menuPlay,
-                              style: TextStyle(
-                                fontSize: 19,
-                                fontWeight: FontWeight.w900,
-                                color: themeColors.accentColor
-                                            .computeLuminance() >
-                                        0.5
-                                    ? Colors.black
-                                    : Colors.white,
-                                letterSpacing: 2.0,
-                              ),
-                            ),
-                          ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      _MenuButton(
+                        label: l10n.menuGameModes,
+                        icon: Icons.grid_view_rounded,
+                        onTap: _isNavigating
+                            ? null
+                            : () => _showModesSelection(
+                                  context,
+                                  progress.currentLevel,
+                                ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      _MenuButton(
+                        label: l10n.menuHowToPlay,
+                        icon: Icons.lightbulb_outline_rounded,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const HowToPlayScreen(),
+                          ),
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    _MenuButton(
-                      label: l10n.menuGameModes,
-                      icon: Icons.grid_view_rounded,
-                      onTap: _isNavigating
-                          ? null
-                          : () => _showModesSelection(
-                                context,
-                                progress.currentLevel,
-                              ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    _MenuButton(
-                      label: l10n.menuHowToPlay,
-                      icon: Icons.help_outline_rounded,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const HowToPlayScreen(),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-              const Spacer(flex: 2),
-            ],
+                const Spacer(flex: 2),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
+}
+
+/// Draws subtle glowing puzzle grid lines across the background
+class _ArcadeGridPainter extends CustomPainter {
+  final Color gridColor;
+
+  _ArcadeGridPainter({required this.gridColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = gridColor
+      ..strokeWidth = 1.0;
+
+    const step = 36.0;
+    for (double x = 0; x <= size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y <= size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ArcadeGridPainter oldDelegate) =>
+      oldDelegate.gridColor != gridColor;
+}
+
+/// Custom 3D Beveled Arrow Emblem Painter matching the Neon Preview
+class _Arrow3DEmblemPainter extends CustomPainter {
+  final Color primaryColor;
+  final Color secondaryColor;
+  final Color depthColor;
+  final bool isLight;
+
+  _Arrow3DEmblemPainter({
+    required this.primaryColor,
+    required this.secondaryColor,
+    required this.depthColor,
+    required this.isLight,
+  });
+
+  Path _buildArrowPath(Size size, {double dy = 0}) {
+    final w = size.width;
+    final h = size.height;
+    return Path()
+      ..moveTo(w * 0.50, h * 0.08 + dy)
+      ..lineTo(w * 0.88, h * 0.48 + dy)
+      ..lineTo(w * 0.65, h * 0.48 + dy)
+      ..lineTo(w * 0.65, h * 0.90 + dy)
+      ..lineTo(w * 0.50, h * 0.78 + dy)
+      ..lineTo(w * 0.35, h * 0.90 + dy)
+      ..lineTo(w * 0.35, h * 0.48 + dy)
+      ..lineTo(w * 0.12, h * 0.48 + dy)
+      ..close();
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    // 1. 3D Extruded Shadow / Depth Layer (shifted down)
+    final depthPath = _buildArrowPath(size, dy: 6.5);
+    final depthPaint = Paint()
+      ..color = depthColor
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(depthPath, depthPaint);
+
+    // 2. Main Front Face
+    final mainPath = _buildArrowPath(size, dy: 0);
+
+    // Left illuminated 3D facet
+    final leftFacet = Path()
+      ..moveTo(w * 0.50, h * 0.08)
+      ..lineTo(w * 0.50, h * 0.78)
+      ..lineTo(w * 0.35, h * 0.90)
+      ..lineTo(w * 0.35, h * 0.48)
+      ..lineTo(w * 0.12, h * 0.48)
+      ..close();
+
+    // Right shaded 3D facet
+    final rightFacet = Path()
+      ..moveTo(w * 0.50, h * 0.08)
+      ..lineTo(w * 0.88, h * 0.48)
+      ..lineTo(w * 0.65, h * 0.48)
+      ..lineTo(w * 0.65, h * 0.90)
+      ..lineTo(w * 0.50, h * 0.78)
+      ..close();
+
+    canvas.drawPath(
+      leftFacet,
+      Paint()
+        ..shader = LinearGradient(
+          colors: [
+            Colors.white.withValues(alpha: isLight ? 0.35 : 0.75),
+            primaryColor,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ).createShader(Rect.fromLTWH(0, 0, w, h)),
+    );
+
+    canvas.drawPath(
+      rightFacet,
+      Paint()
+        ..shader = LinearGradient(
+          colors: [
+            primaryColor,
+            secondaryColor,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ).createShader(Rect.fromLTWH(0, 0, w, h)),
+    );
+
+    // 3. Crisp Glowing Rim Outline
+    final borderPaint = Paint()
+      ..color = isLight ? depthColor : Colors.white.withValues(alpha: 0.9)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeJoin = StrokeJoin.round;
+    canvas.drawPath(mainPath, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _Arrow3DEmblemPainter oldDelegate) =>
+      oldDelegate.primaryColor != primaryColor ||
+      oldDelegate.secondaryColor != secondaryColor ||
+      oldDelegate.depthColor != depthColor;
 }
 
 class _MenuButton extends ConsumerWidget {
@@ -697,17 +918,17 @@ class _MenuButton extends ConsumerWidget {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.symmetric(vertical: 15),
         decoration: BoxDecoration(
-          color: themeColors.surface,
+          color: themeColors.surface.withValues(alpha: 0.92),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: themeColors.accentColor.withValues(alpha: 0.4),
+            color: themeColors.accentColor.withValues(alpha: 0.45),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: themeColors.accentDark.withValues(alpha: 0.35),
+              color: themeColors.accentDark.withValues(alpha: 0.45),
               offset: const Offset(0, 4),
               blurRadius: 0,
             ),
@@ -815,15 +1036,15 @@ class _AppBarIconButton extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: themeColors.surface,
+          color: themeColors.surface.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: themeColors.accentColor.withValues(alpha: 0.35),
+            color: themeColors.accentColor.withValues(alpha: 0.4),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: themeColors.accentDark.withValues(alpha: 0.25),
+              color: themeColors.accentDark.withValues(alpha: 0.3),
               offset: const Offset(0, 3),
               blurRadius: 0,
             ),
