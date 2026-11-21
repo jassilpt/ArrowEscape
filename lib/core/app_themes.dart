@@ -54,13 +54,13 @@ class AppThemes {
     switch (theme) {
       case GameTheme.neon:
         return const ThemeColors(
-          background: Color(0xFF0F0C20),
-          surface: Color(0xFF1A1635),
-          arrowColor: Color(0xFF00FFCC),
-          accentColor: Color(0xFF00FFCC),
-          accentDark: Color(0xFF009977),
+          background: Color(0xFF0B0719),
+          surface: Color(0xFF16102E),
+          arrowColor: Color(0xFF00F5D4),
+          accentColor: Color(0xFF00F5D4),
+          accentDark: Color(0xFF7B2CBF),
           bgGradient: LinearGradient(
-            colors: [Color(0xFF1A0B2E), Color(0xFF0A0518)],
+            colors: [Color(0xFF150D30), Color(0xFF070412)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
