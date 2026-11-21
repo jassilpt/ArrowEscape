@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flame/game.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_themes.dart';
 import '../../core/constants.dart';
@@ -1127,19 +1126,6 @@ class _LevelCompleteDialog extends ConsumerWidget {
               textColor: themeColors.textPrimary,
               iconColor: themeColors.accentColor,
               onTap: onMenu,
-            ),
-            const SizedBox(height: 10),
-            _DialogButton(
-              label: l10n.buyMeACoffee,
-              icon: Icons.coffee_rounded,
-              textColor: themeColors.textPrimary,
-              iconColor: themeColors.accentColor,
-              onTap: () async {
-                final uri = Uri.parse('https://ko-fi.com/sidhant947');
-                try {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                } catch (_) {}
-              },
             ),
           ],
         ),
