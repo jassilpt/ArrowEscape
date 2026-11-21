@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/app_themes.dart';
 import '../../core/constants.dart';
@@ -42,6 +41,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     for (int i = 0; i < 4; i++) {
       levelRepo.preGenerateAsync(currentLevel + i);
     }
+  }
+
+  void _cycleTheme() {
+    final progress = ref.read(progressRepositoryProvider);
+    final allThemes = GameTheme.values;
+    final currentIndex = allThemes.indexOf(progress.selectedTheme);
+    final nextTheme = allThemes[(currentIndex + 1) % allThemes.length];
+    progress.setTheme(nextTheme);
   }
 
   int _randomLevelForDifficulty(String difficulty) {
@@ -385,35 +392,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _AppBarIconButton(
-                  icon: Icons.star_rounded,
-                  iconColor: const Color(0xFFFFD700),
+                  icon: Icons.palette_rounded,
+                  iconColor: themeColors.accentColor,
                   themeColors: themeColors,
-                  onTap: () async {
-                    try {
-                      await launchUrl(
-                        Uri.parse('https://github.com/sidhant947/ArrowEscape'),
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } catch (_) {}
-                  },
+                  onTap: _cycleTheme,
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
+                    horizontal: 22,
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
                     color: themeColors.surface,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: themeColors.accentColor.withValues(alpha: 0.35),
+                      color: themeColors.accentColor.withValues(alpha: 0.45),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: themeColors.accentDark.withValues(alpha: 0.25),
-                        offset: const Offset(0, 3),
-                        blurRadius: 0,
+                        color: themeColors.accentColor.withValues(alpha: 0.15),
+                        blurRadius: 12,
+                        spreadRadius: 1,
                       ),
                     ],
                   ),
@@ -421,9 +421,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.flag_rounded,
+                        Icons.bolt_rounded,
                         color: themeColors.accentColor,
-                        size: 16,
+                        size: 18,
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -432,24 +432,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
                           color: themeColors.textPrimary,
-                          letterSpacing: 1.2,
+                          letterSpacing: 1.4,
                         ),
                       ),
                     ],
                   ),
                 ),
                 _AppBarIconButton(
-                  icon: Icons.favorite_rounded,
-                  iconColor: const Color(0xFFFF4D6D),
+                  icon: Icons.settings_rounded,
+                  iconColor: themeColors.textPrimary,
                   themeColors: themeColors,
-                  onTap: () async {
-                    try {
-                      await launchUrl(
-                        Uri.parse('https://ko-fi.com/sidhant947'),
-                        mode: LaunchMode.externalApplication,
-                      );
-                    } catch (_) {}
-                  },
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SettingsScreen(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -463,52 +461,96 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               const Spacer(flex: 2),
 
-              Icon(Icons.arrow_upward, size: 48, color: themeColors.textPrimary)
-                  .animate(
-                    onPlay: (controller) => controller.repeat(reverse: true),
-                  )
-                  .slideY(
-                    begin: 0,
-                    end: -0.15,
-                    duration: 1500.ms,
-                    curve: Curves.easeInOut,
-                  )
-                  .then()
-                  .shimmer(duration: 1000.ms),
-
-              const SizedBox(height: 20),
-
-              FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      l10n.appTitle,
-                      style: TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.w900,
-                        color: themeColors.textPrimary,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 800.ms)
-                  .scale(
-                    begin: const Offset(0.9, 0.9),
-                    end: const Offset(1.0, 1.0),
-                    curve: Curves.easeOutBack,
+              // Premium Glowing Emblem
+              Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      themeColors.accentColor.withValues(alpha: 0.28),
+                      themeColors.surface.withValues(alpha: 0.9),
+                    ],
                   ),
+                  border: Border.all(
+                    color: themeColors.accentColor,
+                    width: 2.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: themeColors.accentColor.withValues(alpha: 0.35),
+                      blurRadius: 28,
+                      spreadRadius: 4,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.navigation_rounded,
+                    size: 56,
+                    color: themeColors.arrowColor,
+                  )
+                      .animate(
+                        onPlay: (controller) =>
+                            controller.repeat(reverse: true),
+                      )
+                      .slideY(
+                        begin: 0.08,
+                        end: -0.08,
+                        duration: 1400.ms,
+                        curve: Curves.easeInOut,
+                      )
+                      .then()
+                      .shimmer(duration: 1200.ms),
+                ),
+              ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    l10n.appTitle,
+                    style: TextStyle(
+                      fontSize: 46,
+                      fontWeight: FontWeight.w900,
+                      color: themeColors.textPrimary,
+                      letterSpacing: 3,
+                      shadows: themeColors.hasGlow
+                          ? [
+                              Shadow(
+                                color: themeColors.accentColor
+                                    .withValues(alpha: 0.45),
+                                blurRadius: 18,
+                              ),
+                            ]
+                          : null,
+                    ),
+                  ),
+                )
+                    .animate()
+                    .fadeIn(duration: 800.ms)
+                    .scale(
+                      begin: const Offset(0.9, 0.9),
+                      end: const Offset(1.0, 1.0),
+                      curve: Curves.easeOutBack,
+                    ),
+              ),
+
+              const SizedBox(height: 8),
 
               Text(
-                    l10n.appTagline,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: themeColors.textMuted,
-                      letterSpacing: 2,
-                    ),
-                  )
+                l10n.appTagline,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: themeColors.textSecondary,
+                  letterSpacing: 2.2,
+                ),
+              )
                   .animate()
                   .fadeIn(delay: 300.ms, duration: 600.ms)
                   .slideY(begin: 0.5, end: 0),
@@ -516,14 +558,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const Spacer(flex: 3),
 
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
+                padding: const EdgeInsets.symmetric(horizontal: 36),
                 child: Column(
                   children: [
-                    _MenuButton(
-                      label: l10n.menuPlay,
+                    // Primary Highlighted PLAY Button
+                    GestureDetector(
                       onTap: _isNavigating
                           ? null
                           : () async {
+                              AudioHapticHelper.playClick();
                               if (!mounted) return;
                               setState(() => _isNavigating = true);
                               await Navigator.push(
@@ -539,41 +582,80 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 setState(() => _isNavigating = false);
                               }
                             },
-                      showBorder: false,
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    _MenuButton(
-                      label: l10n.menuGameModes,
-                      onTap: _isNavigating
-                          ? null
-                          : () => _showModesSelection(
-                              context,
-                              progress.currentLevel,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              themeColors.accentColor,
+                              themeColors.accentDark,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: themeColors.accentColor
+                                  .withValues(alpha: 0.4),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
                             ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    _MenuButton(
-                      label: l10n.menuHowToPlay,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const HowToPlayScreen(),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.play_arrow_rounded,
+                              color: themeColors.accentColor.computeLuminance() >
+                                      0.5
+                                  ? Colors.black
+                                  : Colors.white,
+                              size: 28,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.menuPlay,
+                              style: TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w900,
+                                color: themeColors.accentColor
+                                            .computeLuminance() >
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white,
+                                letterSpacing: 2.0,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 14),
 
                     _MenuButton(
-                      label: l10n.menuSettings,
+                      label: l10n.menuGameModes,
+                      icon: Icons.grid_view_rounded,
+                      onTap: _isNavigating
+                          ? null
+                          : () => _showModesSelection(
+                                context,
+                                progress.currentLevel,
+                              ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    _MenuButton(
+                      label: l10n.menuHowToPlay,
+                      icon: Icons.help_outline_rounded,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const SettingsScreen(),
+                          builder: (_) => const HowToPlayScreen(),
                         ),
                       ),
                     ),
@@ -592,13 +674,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 class _MenuButton extends ConsumerWidget {
   final String label;
+  final IconData icon;
   final VoidCallback? onTap;
-  final bool showBorder;
 
   const _MenuButton({
     required this.label,
+    required this.icon,
     required this.onTap,
-    this.showBorder = true,
   });
 
   @override
@@ -615,29 +697,37 @@ class _MenuButton extends ConsumerWidget {
       },
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: themeColors.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: themeColors.accentColor, width: 1.5),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: themeColors.accentColor.withValues(alpha: 0.4),
+            width: 1.5,
+          ),
           boxShadow: [
             BoxShadow(
-              color: themeColors.accentDark,
+              color: themeColors.accentDark.withValues(alpha: 0.35),
               offset: const Offset(0, 4),
               blurRadius: 0,
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-              color: themeColors.textPrimary,
-              letterSpacing: 1.5,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: themeColors.accentColor, size: 20),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                color: themeColors.textPrimary,
+                letterSpacing: 1.5,
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
