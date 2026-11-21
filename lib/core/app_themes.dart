@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 enum GameTheme {
   neon,
+  amoledBlack,
+  royalGold,
+  emeraldMatrix,
   classic,
   retro,
   cyber,
@@ -58,6 +61,48 @@ class AppThemes {
           accentDark: Color(0xFF009977),
           bgGradient: LinearGradient(
             colors: [Color(0xFF1A0B2E), Color(0xFF0A0518)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          hasGlow: true,
+        );
+      case GameTheme.amoledBlack:
+        return const ThemeColors(
+          background: Color(0xFF000000),
+          surface: Color(0xFF0D0D12),
+          arrowColor: Color(0xFF38BDF8),
+          accentColor: Color(0xFF38BDF8),
+          accentDark: Color(0xFF0284C7),
+          bgGradient: LinearGradient(
+            colors: [Color(0xFF050508), Color(0xFF000000)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          hasGlow: true,
+        );
+      case GameTheme.royalGold:
+        return const ThemeColors(
+          background: Color(0xFF120F0A),
+          surface: Color(0xFF1F1910),
+          arrowColor: Color(0xFFFFD700),
+          accentColor: Color(0xFFFFD700),
+          accentDark: Color(0xFFB8860B),
+          bgGradient: LinearGradient(
+            colors: [Color(0xFF1D170D), Color(0xFF0A0805)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          hasGlow: true,
+        );
+      case GameTheme.emeraldMatrix:
+        return const ThemeColors(
+          background: Color(0xFF04140E),
+          surface: Color(0xFF0A241A),
+          arrowColor: Color(0xFF10B981),
+          accentColor: Color(0xFF34D399),
+          accentDark: Color(0xFF059669),
+          bgGradient: LinearGradient(
+            colors: [Color(0xFF071F16), Color(0xFF020A07)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -203,13 +248,13 @@ class AppThemes {
           ),
           hasGlow: true,
           arrowPalette: [
-            Color(0xFFFF5252), // Red
-            Color(0xFFFF9100), // Orange
-            Color(0xFFFFEA00), // Yellow
-            Color(0xFF00E676), // Green
-            Color(0xFF00E5FF), // Cyan
-            Color(0xFF7C4DFF), // Purple
-            Color(0xFFFF4081), // Pink
+            Color(0xFFFF5252),
+            Color(0xFFFF9100),
+            Color(0xFFFFEA00),
+            Color(0xFF00E676),
+            Color(0xFF00E5FF),
+            Color(0xFF7C4DFF),
+            Color(0xFFFF4081),
           ],
         );
       case GameTheme.paper:
